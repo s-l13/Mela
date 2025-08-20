@@ -240,7 +240,7 @@ h2 {
 }
 
 #play-again {
-    background: #ff6b6b;
+    background: var(--primary-color);
     color: white;
     border: none;
     padding: 12px 30px;
@@ -258,7 +258,7 @@ h2 {
 }
 
 #play-again:active {
-    transform: translateY(0);
+    transform: translateY(1px);
 }
 
 .success-message {
@@ -388,6 +388,44 @@ h2 {
     .annoying-button {
         padding: 12px 24px;
         font-size: 1rem;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    #game-button {
+        width: 70px !important;
+        height: 70px !important;
+        font-size: 12px !important;
+        padding: 5px !important;
+        border-radius: 50% !important;
+        position: absolute;
+        transition: transform 0.2s ease, left 0.5s ease, top 0.5s ease;
+        will-change: transform, left, top;
+        touch-action: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    #game-button:active {
+        transform: scale(0.9) !important;
+    }
+    
+    /* Prevent text selection */
+    body {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    /* Game area */
+    .game-container {
+        overflow: hidden;
+        position: relative;
+        touch-action: none;
     }
 }
 
