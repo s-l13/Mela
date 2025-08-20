@@ -3,6 +3,7 @@ let clickCount = 0;
 const annoyancesNeeded = 5;
 let currentButton = null;
 const gameArea = document.getElementById('game-area');
+let moveInterval = null;
 
 // DOM Elements
 const successMessage = document.getElementById('success-message');
@@ -47,33 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
         playAgainBtn.addEventListener('click', resetGame);
     }
     
-    // Add test success button
-    const testSuccessBtn = document.getElementById('test-success');
-    if (testSuccessBtn) {
-        console.log('Test success button found');
-        testSuccessBtn.addEventListener('click', function() {
-            console.log('Test success button clicked');
-            showSuccess();
-        });
-    }
-    
     // Check for image load
     checkImage();
-    
-    // Make sure success message is initially hidden with our CSS, not inline styles
-    if (successMessage) {
-        successMessage.style.display = ''; // Remove inline display:none
-    }
-    
-    // Debug: Add a test button to manually show success message
-    const testButton = document.createElement('button');
-    testButton.textContent = 'Test Success Message';
-    testButton.style.position = 'fixed';
-    testButton.style.top = '10px';
-    testButton.style.right = '10px';
-    testButton.style.zIndex = '9999';
-    testButton.onclick = showSuccess;
-    document.body.appendChild(testButton);
 });
 
 // Create a new button
@@ -85,23 +61,50 @@ function createButton() {
         gameArea.removeChild(currentButton);
     }
     
-    // Create new button
+    // Create button
     currentButton = document.createElement('button');
-    currentButton.className = 'annoying-button';
+    currentButton.id = 'game-button';
     currentButton.textContent = getRandomMessage();
-    
-    // Position the button randomly
-    positionButton(currentButton);
     
     // Add event listeners
     currentButton.addEventListener('mouseover', handleButtonHover);
+    currentButton.addEventListener('touchstart', handleButtonHover, { passive: false });
     currentButton.addEventListener('click', handleButtonClick);
     
-    // For touch devices
-    currentButton.addEventListener('touchstart', handleButtonClick, { passive: false });
+    // Position the button
+    positionButton(currentButton);
     
-    // Add to game area
+    // Add button to game area
     gameArea.appendChild(currentButton);
+    
+    // Make button move faster on mobile
+    if (window.innerWidth <= 768) {
+        // Smaller button on mobile
+        currentButton.style.width = '80px';
+        currentButton.style.height = '80px';
+        currentButton.style.fontSize = '14px';
+        currentButton.style.padding = '5px';
+        
+        // Make button move more frequently on mobile
+        if (moveInterval) clearInterval(moveInterval);
+        moveInterval = setInterval(() => {
+            if (currentButton && !currentButton.isHovered) {
+                positionButton(currentButton);
+            }
+        }, 800); // Move every 800ms on mobile (faster than desktop)
+    }
+}
+
+// Handle button hover/touch
+function handleButtonHover(e) {
+    if (e.type === 'touchstart') {
+        e.preventDefault();
+    }
+    
+    // Only move if not on mobile (let the timer handle movement on mobile)
+    if (window.innerWidth > 768) {
+        positionButton(currentButton);
+    }
 }
 
 // Position button randomly within game area
@@ -125,14 +128,6 @@ function positionButton(button) {
     // Random rotation for fun
     const rotation = (Math.random() * 20) - 10; // -10 to 10 degrees
     button.style.transform = `rotate(${rotation}deg)`;
-}
-
-// Handle button hover (move the button)
-function handleButtonHover() {
-    if (currentButton) {
-        positionButton(currentButton);
-        currentButton.textContent = getRandomMessage();
-    }
 }
 
 // Handle button click
@@ -399,19 +394,3 @@ function preventDefault(e) {
 
 // Disable touch actions that could interfere with the game
 document.addEventListener('touchmove', preventDefault, { passive: false });
-
-// Add test button for debugging
-const testButton = document.createElement('button');
-testButton.textContent = 'Test Success Message';
-testButton.style.position = 'fixed';
-testButton.style.top = '10px';
-testButton.style.right = '10px';
-testButton.style.zIndex = '9999';
-testButton.style.padding = '10px';
-testButton.style.background = '#4CAF50';
-testButton.style.color = 'white';
-testButton.style.border = 'none';
-testButton.style.borderRadius = '5px';
-testButton.style.cursor = 'pointer';
-testButton.onclick = showSuccess;
-document.body.appendChild(testButton);
